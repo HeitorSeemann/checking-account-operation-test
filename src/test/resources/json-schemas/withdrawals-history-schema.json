@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org",
+  "title": "Withdrawals History Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "id",
+      "account",
+      "value",
+      "type",
+      "date"
+    ],
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "account": {
+        "type": "integer"
+      },
+      "value": {
+        "type": "number"
+      },
+      "type": {
+        "type": "string"
+      },
+      "date": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false
+  }
+}

@@ -1,4 +1,4 @@
-package com.pereira.contacorrente;
+package com.heitor.checkingaccountoperation;
 
 import static io.restassured.RestAssured.basePath;
 import static io.restassured.RestAssured.baseURI;
@@ -7,8 +7,8 @@ import static io.restassured.RestAssured.port;
 import static io.restassured.config.JsonConfig.jsonConfig;
 import static io.restassured.config.RestAssuredConfig.newConfig;
 
-import com.pereira.contacorrente.config.Configuration;
-import com.pereira.contacorrente.config.ConfigurationManager;
+import com.heitor.checkingaccountoperation.config.Configuration;
+import com.heitor.checkingaccountoperation.config.ConfigurationManager;
 import io.restassured.RestAssured;
 import io.restassured.config.SSLConfig;
 import io.restassured.filter.log.RequestLoggingFilter;

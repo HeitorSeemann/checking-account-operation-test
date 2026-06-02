@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org",
+  "title": "Post Withdrawal Response Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "note",
+      "quantity"
+    ],
+    "properties": {
+      "note": {
+        "type": "integer"
+      },
+      "quantity": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false
+  }
+}

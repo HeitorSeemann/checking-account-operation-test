@@ -1,4 +1,4 @@
-package com.pereira.contacorrente.config;
+package com.heitor.checkingaccountoperation.config;
 
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;

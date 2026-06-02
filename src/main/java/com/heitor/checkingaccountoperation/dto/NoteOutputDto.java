@@ -1,4 +1,4 @@
-package com.pereira.contacorrente.dto;
+package com.heitor.checkingaccountoperation.dto;
 
 import lombok.Getter;
 

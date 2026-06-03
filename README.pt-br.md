@@ -22,7 +22,7 @@ Este repositório contém a suíte de testes automatizados para o microsserviço
 ## 📋 Como Executar os Testes
 
 ### Pré-requisitos
-*   O microsserviço alvo (`operacao-conta-corrente`) deve estar rodando localmente ou em ambiente de teste.
+*   O microsserviço alvo (`checking-account-operation`) deve estar rodando localmente ou em ambiente de teste.
 *   Java 17+ e Maven instalados.
 
 ### Execução

@@ -2,7 +2,7 @@
 
 _Read this in other languages: [Português](README.pt-br.md)_
 
-This repository contains the automated test suite for the **operacao-conta-corrente** microservice. It covers functional API testing, stress testing, and event-driven architecture validation.
+This repository contains the automated test suite for the **operacao-conta-corrente** microservice. It covers functional API testing, kafka testing, stress testing, and event-driven architecture validation.
 
 ## 🚀 Key Features
 
@@ -16,6 +16,7 @@ This repository contains the automated test suite for the **operacao-conta-corre
 *   **Java 17+** - Core programming language.
 *   **RestAssured** - Library for REST API testing and validation.
 *   **Maven** - Dependency management and test execution build tool.
+*   **Kafka** - Event management.
 
 ## 📋 How to Run the Tests
 

@@ -20,7 +20,7 @@ import static org.apache.http.HttpStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestMethodOrder(OrderAnnotation.class)
-class WithdrawalFunctionalTest {
+class ApiWithdrawalFunctionalTest {
 
     private CheckingAccountOperationClient checkingAccountOperationClient = new CheckingAccountOperationClient();
 

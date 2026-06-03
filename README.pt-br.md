@@ -3,7 +3,7 @@
 
 _Leia este arquivo em outro idioma: [English](README.md)_
 
-Este repositório contém a suíte de testes automatizados para o microsserviço **operacao-conta-corrente**. O projeto cobre testes funcionais de API, testes de estresse e validação de arquiteturas baseadas em eventos.
+Este repositório contém a suíte de testes automatizados para o microsserviço **operacao-conta-corrente**. O projeto cobre testes funcionais de API, testes de evento, testes de estresse e validação de arquiteturas baseadas em eventos.
 
 ## 🚀 Funcionalidades Principais
 
@@ -17,11 +17,12 @@ Este repositório contém a suíte de testes automatizados para o microsserviço
 *   **Java 17+** - Linguagem de programação base.
 *   **RestAssured** - Framework para automação e validação de APIs REST.
 *   **Maven** - Gerenciador de dependências e executor do ciclo de testes.
+*   **Kafka** - Gerenciador de eventos.
 
 ## 📋 Como Executar os Testes
 
 ### Pré-requisitos
-*   O microsserviço alvo (`operacao-conta-corrente`) deve estar rodando localmente ou em ambiente de teste.
+*   O microsserviço alvo (`checking-account-operation`) deve estar rodando localmente ou em ambiente de teste.
 *   Java 17+ e Maven instalados.
 
 ### Execução

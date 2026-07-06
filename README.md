@@ -24,6 +24,8 @@ This repository contains the automated test suite for the **operacao-conta-corre
 *   The target microservice (`checking-account-operation`) must be running locally or in a test environment.
 *   Java 17+ and Maven installed.
 
+⚠️ **CI/CD Note:** Because this suite relies strictly on a local high-performance Data Factory framework running on `localhost`, execution is designed for local test environments and specialized staging gates, deliberately bypassing cloud-hosted GitHub Actions runners to ensure environment isolation.
+
 ### Execution
 
 1. **Clone this repository:**

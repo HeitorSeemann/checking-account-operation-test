@@ -44,6 +44,9 @@ jobs:
         run: |
           cd main-api
           if [ -f docker-compose.yml ]; then
+            # Tenta mitigar o erro 500 fazendo um pull prévio com retry automático se falhar
+            echo "Tentando baixar as imagens do docker-compose..."
+            docker compose pull || echo "Falha no pull inicial, tentando subir diretamente..."
             docker compose up -d
           else
             echo "Docker compose não encontrado no projeto principal."

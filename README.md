@@ -11,28 +11,44 @@ It covers functional API testing, kafka testing, stress testing, and event-drive
 *   **Stress Testing:** Performance and resilience validation under high load.
 *   **Event-Driven Testing:** Validation of asynchronous message patterns and events.
 *   **Structured Assertions:** Advanced JSON payload and status code verification.
+*   **CI/CD Integration:** Automated end-to-end testing pipeline via GitHub Actions.
 
 ## 🛠️ Technologies Used
 
-*   **Java 17+** - Core programming language.
+*   **Java 11** - Core programming language.
 *   **RestAssured** - Library for REST API testing and validation.
 *   **Maven** - Dependency management and test execution build tool.
 *   **Kafka** - Event management.
+*   **Docker & Docker Compose** - Containerization for infrastructure dependency.
+*   **GitHub Actions** - Continuous Integration platform.
+
+## ⚙️ Continuous Integration (CI)
+
+This project includes a fully automated **GitHub Actions** workflow (`ci.yml`) that runs on every push and pull request to the `main` or `master` branches.
+
+Whenever code is updated, the pipeline automatically:
+1. Clones this test repository.
+2. Clones the main microservice repository (`checking-account-operation`).
+3. Sets up the Java 11 environment.
+4. Compiles and packages the target microservice using Gradle.
+5. Spins up **Kafka**, **Zookeeper**, and the **Spring Boot API** using Docker Compose.
+6. Waits for all services to become healthy and available.
+7. Executes the entire Cucumber/RestAssured test suite using Maven.
+
+---
 
 ## 📋 How to Run the Tests
 
 ### Prerequisites
 *   The target microservice (`checking-account-operation`) must be running locally or in a test environment.
-*   Java 17+ and Maven installed.
-
-⚠️ **CI/CD Note:** Because this suite relies strictly on a local high-performance Data Factory framework running on `localhost`, execution is designed for local test environments and specialized staging gates, deliberately bypassing cloud-hosted GitHub Actions runners to ensure environment isolation.
+*   Java 11 and Maven installed.
 
 ### Execution
 
 1. **Clone this repository:**
    ```bash
    git clone https://github.com
-   cd restassured-operacao-conta-corrente-automacao
+   cd checking-account-operation-test
    ```
 
 2. **Run all automated tests:**

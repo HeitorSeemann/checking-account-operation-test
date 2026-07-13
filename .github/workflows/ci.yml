@@ -28,14 +28,16 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '11'
 
-      # 4. Executa o build do projeto Spring para gerar o arquivo .jar
+      # 4. Executa o build do projeto Spring forçando o uso do Java 11
       - name: Build Main API (Generate JAR)
         run: |
           cd main-api
           chmod +x ./gradlew
           ./gradlew bootJar
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_11_X64 }}
 
       # 5. Sobe o Kafka e os serviços necessários via Docker
       - name: Start Kafka and API Services
@@ -55,7 +57,6 @@ jobs:
           sleep 20
 
       # 7. Configura o ambiente para rodar os seus testes
-      # IMPORTANTE: Mude para 'setup-python', 'setup-java' ou o que usar no repositório de testes
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:

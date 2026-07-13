@@ -1,60 +1,26 @@
-name: E2E Integration Tests
+# 2. Baixa o código da API principal (Checking Account Operation)
+- name: Checkout Main API Repo
+  uses: actions/checkout@v4
+  with:
+    repository: HeitorSeemann/checking-account-operation
+    path: main-api
 
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch: # Permite rodar manualmente pela interface do GitHub
+# NOVO: Configura o ambiente Java necessário para buildar o projeto principal
+- name: Setup Java for Main API
+  uses: actions/setup-java@v4
+  with:
+    distribution: 'temurin' # Ou a distribuição de sua preferência
+    java-version: '17'      # Ajuste para a versão exata do seu projeto (17, 21, etc.)
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
+# NOVO: Executa o build do projeto Spring para gerar o arquivo .jar
+- name: Build Main API (Generate JAR)
+  run: |
+    cd main-api
+    chmod +x ./gradlew
+    ./gradlew bootJar # Usa 'build -x test' se preferir pular os testes unitários dele aqui
 
-    steps:
-      # 1. Baixa o código do repositório atual (Automação de Testes)
-      - name: Checkout Testing Repo
-        uses: actions/checkout@v4
-
-      # 2. Baixa o código da API principal (Checking Account Operation)
-      - name: Checkout Main API Repo
-        uses: actions/checkout@v4
-        with:
-          repository: HeitorSeemann/checking-account-operation
-          path: main-api # Salva o projeto em uma pasta separada
-
-      # 3. Sobe o Kafka e os serviços necessários via Docker
-      # Nota: Se o repositório principal já tiver um docker-compose.yml, usamos ele.
-      - name: Start Kafka and API Services
-        run: |
-          cd main-api
-          if [ -f docker-compose.yml ]; then
-            docker compose up -d
-          else
-            echo "Docker compose não encontrado no projeto principal. Suba o Kafka manualmente aqui."
-            # Exemplo caso precise subir um container isolado:
-            # docker run -d --name kafka -p 9092:9092 apache/kafka:latest
-          fi
-
-      # 4. Aguarda o Kafka e a API ficarem saudáveis (Healthcheck rápido)
-      - name: Wait for services to be ready
-        run: |
-          echo "Aguardando inicialização dos serviços..."
-          sleep 15 # Ajuste o tempo conforme a necessidade de inicialização do Kafka
-
-      # 5. Configura o ambiente da linguagem da automação (Exemplo se for Node.js, Java, Python, etc.)
-      # Ajuste esta etapa para a tecnologia exata que você usou para escrever os testes.
-      - name: Setup Node.js (Exemplo)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      # 6. Instala as dependências e roda a automação de teste
-      - name: Run Automation Tests
-        run: |
-          npm install
-          npm test
-        env:
-          # Passa as variáveis de ambiente apontando para a API e Kafka locais do runner
-          API_URL: http://localhost:8080
-          KAFKA_BROKERS: localhost:9092
+# 3. Agora sim, sobe os serviços com o Docker Compose
+- name: Start Kafka and API Services
+  run: |
+    cd main-api
+    docker compose up -d

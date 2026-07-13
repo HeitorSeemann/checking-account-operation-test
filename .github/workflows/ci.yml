@@ -12,25 +12,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Baixa o código do repositório atual (Automação de Testes Cucumber/Java)
       - name: Checkout Testing Repo
         uses: actions/checkout@v4
 
-      # 2. Baixa o código da API principal (Checking Account Operation)
       - name: Checkout Main API Repo
         uses: actions/checkout@v4
         with:
           repository: HeitorSeemann/checking-account-operation
           path: main-api
 
-      # 3. Configura o ambiente Java necessário para a API e para os Testes
       - name: Setup Java Environment
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '11'
 
-      # 4. Executa o build do projeto Spring forçando o uso do Java 11
       - name: Build Main API (Generate JAR)
         run: |
           cd main-api
@@ -39,7 +35,6 @@ jobs:
         env:
           JAVA_HOME: ${{ env.JAVA_HOME_11_X64 }}
 
-      # 5. Sobe o Kafka e os serviços com lógica de re-tentativa contra erro 500
       - name: Start Kafka and API Services
         run: |
           cd main-api
@@ -55,14 +50,12 @@ jobs:
             exit 1
           fi
 
-      # 6. Aguarda o Kafka e a API ficarem saudáveis
       - name: Wait for services to be ready
         run: |
           echo "Aguardando inicialização dos serviços..."
           sleep 30 # Aumentado para 30s para garantir que a API Spring Boot suba completamente
 
-      # 7. Executa a automação de testes utilizando Maven (Cucumber)
-      - name: Run Cucumber Automation Tests
+      - name: Run Automation Tests
         run: |
           mvn clean test
         env:

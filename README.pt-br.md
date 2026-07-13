@@ -1,50 +1,68 @@
-# Automação de Testes - Operação Conta Corrente 🧪
+# Checking Account Automation Tests 🧪
 
+_Leia isso em outros idiomas: [English](README.md)_
 
-_Leia este arquivo em outro idioma: [English](README.md)_
+Este repositório contém a suíte de testes automatizados para o microsserviço **checking-account-operation**, URL: https://github.com
+Ele cobre testes funcionais de API, testes com Kafka, testes de estresse e validação de arquitetura orientada a eventos.
 
-Este repositório contém a suíte de testes automatizados para o microsserviço **operacao-conta-corrente**. O projeto cobre testes funcionais de API, testes de evento, testes de estresse e validação de arquiteturas baseadas em eventos.
+## 🚀 Principais Funcionalidades
 
-## 🚀 Funcionalidades Principais
-
-*   **Automação de API:** Testes de integração robustos utilizando **RestAssured**.
-*   **Testes de Estresse:** Validação de performance e resiliência sob alta carga de requisições.
-*   **Testes Baseados em Eventos:** Verificação de fluxos assíncronos e mensageria.
-*   **Validações Estruturadas:** Checagem avançada de status HTTP e payloads JSON.
+*   **Automação de API:** Testes de integração abrangentes utilizando **RestAssured**.
+*   **Testes de Estresse:** Validação de performance e resiliência sob alta carga.
+*   **Testes Orientados a Eventos:** Validação de padrões de mensagens assíncronas e eventos.
+*   **Asserções Estruturadas:** Verificação avançada de payloads JSON e códigos de status HTTP.
+*   **Integração CI/CD:** Pipeline de testes end-to-end automatizada via GitHub Actions.
 
 ## 🛠️ Tecnologias Utilizadas
 
-*   **Java 17+** - Linguagem de programação base.
-*   **RestAssured** - Framework para automação e validação de APIs REST.
-*   **Maven** - Gerenciador de dependências e executor do ciclo de testes.
-*   **Kafka** - Gerenciador de eventos.
+*   **Java 11** - Linguagem de programação principal.
+*   **RestAssured** - Biblioteca para testes e validação de APIs REST.
+*   **Maven** - Ferramenta de gerenciamento de dependências e build.
+*   **Kafka** - Gerenciamento de eventos.
+*   **Docker & Docker Compose** - Containerização para dependências de infraestrutura.
+*   **GitHub Actions** - Plataforma de Integração Contínua (CI).
+
+## ⚙️ Integração Contínua (CI)
+
+Este projeto inclui um workflow completo do **GitHub Actions** (`ci.yml`) que é executado a cada push e pull request nos branches `main` ou `master`. 
+
+Sempre que o código é atualizado, a pipeline executa automaticamente os seguintes passos:
+1. Faz o clone deste repositório de testes.
+2. Faz o clone do repositório do microsserviço principal (`checking-account-operation`).
+3. Configura o ambiente com Java 11.
+4. Compila e empacota o microsserviço principal utilizando o Gradle.
+5. Sobe os containers do **Kafka**, **Zookeeper** e a **API Spring Boot** via Docker Compose.
+6. Aguarda até que todos os serviços estejam saudáveis e disponíveis.
+7. Executa toda a suíte de testes Cucumber/RestAssured utilizando o Maven.
+
+---
 
 ## 📋 Como Executar os Testes
 
 ### Pré-requisitos
-*   O microsserviço alvo (`checking-account-operation`) deve estar rodando localmente ou em ambiente de teste.
-*   Java 17+ e Maven instalados.
+*   O microsserviço principal (`checking-account-operation`) deve estar rodando localmente ou em um ambiente de testes.
+*   Java 11 e Maven instalados.
 
 ### Execução
 
-1. **Clonar o repositório:**
+1. **Clone este repositório:**
    ```bash
-   git clone https://github.com
-   cd restassured-operacao-conta-corrente-automacao
+   git clone https://github.com-test.git
+   cd checking-account-operation-test
    ```
 
-2. **Executar todos os testes:**
+2. **Execute todos os testes automatizados:**
    ```bash
    mvn clean test
    ```
 
-3. **Executar uma classe de teste específica (Opcional):**
+3. **Execute classes de teste específicas (Opcional):**
    ```bash
    mvn test -Dtest=NomeDaClasseTest
    ```
 
 ---
 
-## ✒️ Autore
+## ✒️ Autor
 
-*   **Heitor Seemann** - *Mantenedor do Repositório* - [HeitorSeemann](https://github.com/HeitorSeemann)
+*   **Heitor Seemann** - *Criador & Mantenedor* - [HeitorSeemann](https://github.com)

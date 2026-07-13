@@ -1,26 +1,71 @@
-# 2. Baixa o código da API principal (Checking Account Operation)
-- name: Checkout Main API Repo
-  uses: actions/checkout@v4
-  with:
-    repository: HeitorSeemann/checking-account-operation
-    path: main-api
+name: E2E Integration Tests
 
-# NOVO: Configura o ambiente Java necessário para buildar o projeto principal
-- name: Setup Java for Main API
-  uses: actions/setup-java@v4
-  with:
-    distribution: 'temurin' # Ou a distribuição de sua preferência
-    java-version: '17'      # Ajuste para a versão exata do seu projeto (17, 21, etc.)
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
 
-# NOVO: Executa o build do projeto Spring para gerar o arquivo .jar
-- name: Build Main API (Generate JAR)
-  run: |
-    cd main-api
-    chmod +x ./gradlew
-    ./gradlew bootJar # Usa 'build -x test' se preferir pular os testes unitários dele aqui
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
-# 3. Agora sim, sobe os serviços com o Docker Compose
-- name: Start Kafka and API Services
-  run: |
-    cd main-api
-    docker compose up -d
+    steps:
+      # 1. Baixa o código do repositório atual (Automação de Testes)
+      - name: Checkout Testing Repo
+        uses: actions/checkout@v4
+
+      # 2. Baixa o código da API principal (Checking Account Operation)
+      - name: Checkout Main API Repo
+        uses: actions/checkout@v4
+        with:
+          repository: HeitorSeemann/checking-account-operation
+          path: main-api
+
+      # 3. Configura o ambiente Java necessário para buildar o projeto principal
+      - name: Setup Java for Main API
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 4. Executa o build do projeto Spring para gerar o arquivo .jar
+      - name: Build Main API (Generate JAR)
+        run: |
+          cd main-api
+          chmod +x ./gradlew
+          ./gradlew bootJar
+
+      # 5. Sobe o Kafka e os serviços necessários via Docker
+      - name: Start Kafka and API Services
+        run: |
+          cd main-api
+          if [ -f docker-compose.yml ]; then
+            docker compose up -d
+          else
+            echo "Docker compose não encontrado no projeto principal."
+            exit 1
+          fi
+
+      # 6. Aguarda o Kafka e a API ficarem saudáveis
+      - name: Wait for services to be ready
+        run: |
+          echo "Aguardando inicialização dos serviços..."
+          sleep 20
+
+      # 7. Configura o ambiente para rodar os seus testes
+      # IMPORTANTE: Mude para 'setup-python', 'setup-java' ou o que usar no repositório de testes
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 8. Instala as dependências e roda a automação de teste
+      - name: Run Automation Tests
+        run: |
+          npm install
+          npm test
+        env:
+          API_URL: http://localhost:8080
+          KAFKA_BROKERS: localhost:9092

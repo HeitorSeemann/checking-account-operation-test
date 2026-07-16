@@ -3,11 +3,13 @@ package com.heitor.checkingaccountoperation.contract;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.heitor.checkingaccountoperation.client.CheckingAccountOperationClient;
 import com.heitor.checkingaccountoperation.dto.TransactionInputDto;
+import io.qameta.allure.junit5.AllureJunit5;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -16,6 +18,7 @@ import static java.util.UUID.randomUUID;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_OK;
 
+@ExtendWith(AllureJunit5.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class WithdrawalContractTest {
 

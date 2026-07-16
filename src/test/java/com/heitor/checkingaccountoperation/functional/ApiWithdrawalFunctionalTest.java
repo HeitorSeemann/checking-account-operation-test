@@ -6,11 +6,13 @@ import com.heitor.checkingaccountoperation.dto.TransactionInputDto;
 import com.heitor.checkingaccountoperation.dto.TransactionOutputDTO;
 import com.heitor.checkingaccountoperation.util.Util;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.qameta.allure.junit5.AllureJunit5;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -19,6 +21,7 @@ import static java.util.UUID.randomUUID;
 import static org.apache.http.HttpStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(AllureJunit5.class)
 @TestMethodOrder(OrderAnnotation.class)
 class ApiWithdrawalFunctionalTest {
 

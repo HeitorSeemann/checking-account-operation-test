@@ -31,7 +31,7 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Test Automation Repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 25
@@ -41,9 +41,35 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Run tests
+      - name: Clone and Start Target API Application
+        run: |
+          git clone https://github.com api-repo
+          cd api-repo
+          if [ -f docker-compose.yml ] || [ -f docker/docker-compose.yml ]; then
+            docker compose up -d || true
+          else
+            mvn clean package -DskipTests
+            nohup java -jar target/*.jar > app.log 2>&1 &
+          fi
+          cd ..
+
+      - name: Wait for Target API to be Operational
+        run: |
+          echo "Waiting for API endpoint availability..."
+          timeout 90s sh -c 'until curl -f http://localhost:8080/actuator/health || curl -f http://localhost:8080/health || curl -f http://127.0.0; do sleep 5; done' || echo "Proceeding to testing suite execution..."
+
+      - name: Run test automation suite
         run: mvn clean test
         continue-on-error: true
+
+      - name: Tear Down Infrastructure Environment
+        if: always()
+        run: |
+          if [ -d api-repo ]; then
+            cd api-repo
+            docker compose down || true
+            cd ..
+          fi
 
       - name: Get Allure history
         uses: actions/checkout@v4

@@ -23,15 +23,13 @@ jobs:
 
       - name: Start Infrastructure (Docker Compose)
         run: |
-          cd checking-account-operation
           docker compose up -d
 
       - name: Grant execute permission for gradlew
-        run: chmod +x checking-account-operation/gradlew
+        run: chmod +x gradlew
 
       - name: Build and Start Main Service
         run: |
-          cd checking-account-operation
           ./gradlew bootRun &
 
       - name: Wait for services to be ready

@@ -26,9 +26,30 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Start Application Infrastructure
+        run: |
+          if [ -f docker-compose.yml ]; then
+            docker compose up -d
+          elif [ -f docker/docker-compose.yml ]; then
+            docker compose -f docker/docker-compose.yml up -d
+          fi
+
+      - name: Wait for API to be ready
+        run: |
+          timeout 60s sh -c 'until curl -s http://localhost:8080/actuator/health || curl -s http://localhost:8080/health; do sleep 3; done' || true
+
       - name: Run tests
         run: mvn clean test
         continue-on-error: true
+
+      - name: Stop Application Infrastructure
+        if: always()
+        run: |
+          if [ -f docker-compose.yml ]; then
+            docker compose down
+          elif [ -f docker/docker-compose.yml ]; then
+            docker compose -f docker/docker-compose.yml down
+          fi
 
       - name: Get Allure history
         uses: actions/checkout@v4

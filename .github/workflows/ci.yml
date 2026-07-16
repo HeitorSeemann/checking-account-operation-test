@@ -26,8 +26,11 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Clone Target API Source Code
-        run: git clone https://github.com api-target
+      - name: Checkout Target API Source Code
+        uses: actions/checkout@v4
+        with:
+          repository: HeitorSeemann/checking-account-operation
+          path: api-target
 
       - name: Setup Gradle for Target API
         uses: actions/setup-java@v4

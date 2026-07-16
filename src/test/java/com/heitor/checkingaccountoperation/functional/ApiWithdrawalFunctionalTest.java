@@ -46,16 +46,16 @@ class ApiWithdrawalFunctionalTest {
 
         List<NoteOutputDto> listMoney = Util.convertToListNoteOutputDto(response.getBody().print());
 
-        assertThat(listMoney.get(0).getNote()).isEqualTo(10);
-        assertThat(listMoney.get(0).getQuantity()).isEqualTo(1);
-        assertThat(listMoney.get(1).getNote()).isEqualTo(20);
+        assertThat(listMoney.get(1).getNote()).isEqualTo(10);
         assertThat(listMoney.get(1).getQuantity()).isEqualTo(1);
+        assertThat(listMoney.get(0).getNote()).isEqualTo(20);
+        assertThat(listMoney.get(0).getQuantity()).isEqualTo(1);
     }
 
     @Test
     @Order(3)
     void shouldNotWithdrawalsWithSameUUID() throws JsonProcessingException {
-            checkingAccountOperationClient
+        checkingAccountOperationClient
                 .postWithdrawals(String.valueOf(ACCOUNT_ID), new TransactionInputDto(30), UUID)
                 .statusCode(SC_UNPROCESSABLE_ENTITY);
     }

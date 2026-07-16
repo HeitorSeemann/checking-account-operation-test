@@ -9,11 +9,9 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
-
 import static java.util.UUID.randomUUID;
 import static org.apache.http.HttpStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,14 +35,16 @@ class KafkaWithdrawalFunctionalTest {
     @Test
     @Order(2)
     void shouldWithdrawals() throws ExecutionException, InterruptedException {
-        producer.sendMesssage("{\"accountId\": " + ACCOUNT_ID + ", \"uuid\":\""+ UUID +"\", \"amount\": "+ VALUE +"}");
-        Thread.sleep(1000);
+        String jsonPayload = "{\"accountId\": " + ACCOUNT_ID + ", \"uuid\":\"" + UUID + "\", \"amount\": " + VALUE + "}";
+        producer.sendEvent("account-withdrawals", jsonPayload);
+        Thread.sleep(4000);
+
         Response response = checkingAccountOperationClient.getTrasanctions(String.valueOf(ACCOUNT_ID))
                 .statusCode(SC_OK)
                 .extract().response();
+
         List<TransactionOutputDTO> list = Util.convertToListTransactionOutputDTO(response.getBody().print());
         assertThat(list.get(0).getValue()).isEqualTo(VALUE);
         assertThat(list.get(0).getAccount()).isEqualTo(ACCOUNT_ID);
     }
-
 }

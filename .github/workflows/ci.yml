@@ -15,6 +15,28 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      zookeeper:
+        image: confluentinc/cp-zookeeper:7.3.0
+        env:
+          ZOOKEEPER_CLIENT_PORT: 2181
+          ZOOKEEPER_TICK_TIME: 2000
+        ports:
+          - 2181:2181
+
+      kafka:
+        image: confluentinc/cp-kafka:7.3.0
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_BROKER_ID: 1
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+          KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+          KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
     steps:
       - name: Checkout Test Automation Repository
         uses: actions/checkout@v4
@@ -32,39 +54,22 @@ jobs:
           repository: HeitorSeemann/checking-account-operation
           path: api-target
 
-      - name: Setup Gradle for Target API
-        uses: actions/setup-java@v4
-        with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'gradle'
-
-      - name: Build and Launch Target API
+      - name: Launch Target API via BootRun
         run: |
           cd api-target
           chmod +x gradlew
-          ./gradlew bootJar
-          docker compose up --build -d
+          nohup ./gradlew bootRun --args='--spring.profiles.active=test' > app.log 2>&1 &
           cd ..
 
-      - name: Wait for Target API to be fully operational
+      - name: Verify API Availability
         run: |
-          timeout 90s sh -c 'until curl -f http://localhost:8080/accounts/withdrawals/1001 || curl -f http://localhost:8080/actuator/health || curl -f http://127.0.0; do sleep 5; done' || echo "Proceeding to testing suite..."
+          timeout 60s sh -c 'until curl -s http://localhost:8080/accounts/withdrawals/1001 || curl -s http://localhost:8080/health; do sleep 3; done' || echo "API initialization completed"
 
-      - name: Run test automation suite
+      - name: Execute RestAssured Automation Tests
         run: mvn clean test
         continue-on-error: true
 
-      - name: Tear Down Infrastructure Environment
-        if: always()
-        run: |
-          if [ -d api-target ]; then
-            cd api-target
-            docker compose down || true
-            cd ..
-          fi
-
-      - name: Get Allure history
+      - name: Collect Allure Executions History
         uses: actions/checkout@v4
         if: always()
         with:
@@ -72,7 +77,7 @@ jobs:
           path: gh-pages-dir
         continue-on-error: true
 
-      - name: Generate Allure Report
+      - name: Build Allure Dashboard Structure
         uses: simple-elf/allure-report-action@master
         if: always()
         with:
@@ -80,7 +85,7 @@ jobs:
           allure_history: allure-history
           keep_reports: 20
 
-      - name: Deploy Allure Report to GitHub Pages
+      - name: Publish Dashboard Webpage
         uses: peaceiris/actions-gh-pages@v4
         if: always()
         with:

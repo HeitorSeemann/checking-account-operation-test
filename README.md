@@ -15,7 +15,7 @@ It covers functional API testing, kafka testing, stress testing, and event-drive
 
 ## 🛠️ Technologies Used
 
-*   **Java 11** - Core programming language.
+*   **Java 25** - Core programming language.
 *   **RestAssured** - Library for REST API testing and validation.
 *   **Maven** - Dependency management and test execution build tool.
 *   **Kafka** - Event management.
@@ -29,7 +29,7 @@ This project includes a fully automated **GitHub Actions** workflow (`ci.yml`) t
 Whenever code is updated, the pipeline automatically:
 1. Clones this test repository.
 2. Clones the main microservice repository (`checking-account-operation`).
-3. Sets up the Java 11 environment.
+3. Sets up the Java 25 environment.
 4. Compiles and packages the target microservice using Gradle.
 5. Spins up **Kafka**, **Zookeeper**, and the **Spring Boot API** using Docker Compose.
 6. Waits for all services to become healthy and available.

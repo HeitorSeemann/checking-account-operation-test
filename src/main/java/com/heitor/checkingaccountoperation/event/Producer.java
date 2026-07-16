@@ -1,47 +1,42 @@
 package com.heitor.checkingaccountoperation.event;
 
-import lombok.var;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.Callback;
+import com.google.gson.Gson;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
-
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
-
-
 
 public class Producer {
 
-    private static final String TOPIC = "account-withdrawals";
-    private static final String BOOTSTRAP = "localhost:9092";
+    private final KafkaProducer<String, String> producer;
 
-    public void sendMesssage(String nome) throws ExecutionException, InterruptedException {
-        var producer = new KafkaProducer<String, String>(getProperties());
-        var key = "NOME";
-        var record = new ProducerRecord<String, String>(TOPIC, key, nome);
-
-        Callback callback = (data, ex) -> {
-            if (ex != null) {
-                ex.printStackTrace();
-                return;
-            }
-            System.out.println(
-                    "Message to: " + data.topic() + " | partition " + data.partition() + "| offset " + data.offset() + "| time " + data
-                            .timestamp());
-        };
-        producer.send(record, callback).get();
+    public Producer() {
+        this.producer = new KafkaProducer<>(properties());
     }
 
+    public void sendEvent(String topic, Object payload) {
+        String json;
+        if (payload instanceof String) {
+            json = (String) payload;
+        } else {
+            var gson = new Gson();
+            json = gson.toJson(payload);
+        }
 
-    public static Properties getProperties() {
+        var record = new ProducerRecord<>(topic, payload.getClass().getSimpleName(), json);
+        try {
+            producer.send(record).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Properties properties() {
         var properties = new Properties();
-        properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP);
+        properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         return properties;
     }
-
 }

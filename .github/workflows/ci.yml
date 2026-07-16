@@ -15,42 +15,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_DB: checking_account
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      zookeeper:
-        image: confluentinc/cp-zookeeper:7.3.0
-        env:
-          ZOOKEEPER_CLIENT_PORT: 2181
-          ZOOKEEPER_TICK_TIME: 2000
-        ports:
-          - 2181:2181
-
-      kafka:
-        image: confluentinc/cp-kafka:7.3.0
-        ports:
-          - 9092:9092
-        env:
-          KAFKA_BROKER_ID: 1
-          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
-          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-          KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-          KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-
     steps:
       - name: Checkout Test Automation Repository
         uses: actions/checkout@v4
@@ -65,20 +29,37 @@ jobs:
       - name: Clone Target API Source Code
         run: git clone https://github.com api-target
 
+      - name: Setup Gradle for Target API
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'gradle'
+
       - name: Build and Launch Target API
         run: |
           cd api-target
-          mvn clean package -DskipTests
-          nohup java -jar target/*.jar > app-api.log 2>&1 &
+          chmod +x gradlew
+          ./gradlew bootJar
+          docker compose up --build -d
           cd ..
 
       - name: Wait for Target API to be fully operational
         run: |
-          timeout 90s sh -c 'until curl -f http://localhost:8080/actuator/health || curl -f http://localhost:8080/health || curl -f http://127.0.0; do sleep 5; done' || echo "Proceeding to testing suite..."
+          timeout 90s sh -c 'until curl -f http://localhost:8080/accounts/withdrawals/1001 || curl -f http://localhost:8080/actuator/health || curl -f http://127.0.0; do sleep 5; done' || echo "Proceeding to testing suite..."
 
       - name: Run test automation suite
         run: mvn clean test
         continue-on-error: true
+
+      - name: Tear Down Infrastructure Environment
+        if: always()
+        run: |
+          if [ -d api-target ]; then
+            cd api-target
+            docker compose down || true
+            cd ..
+          fi
 
       - name: Get Allure history
         uses: actions/checkout@v4

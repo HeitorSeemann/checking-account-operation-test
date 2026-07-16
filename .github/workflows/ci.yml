@@ -32,11 +32,13 @@ jobs:
             docker compose up -d
           elif [ -f docker/docker-compose.yml ]; then
             docker compose -f docker/docker-compose.yml up -d
+          elif [ -d performance-tests ]; then
+            docker compose up -d || true
           fi
 
       - name: Wait for API to be ready
         run: |
-          timeout 60s sh -c 'until curl -s http://localhost:8080/actuator/health || curl -s http://localhost:8080/health; do sleep 3; done' || true
+          sleep 15
 
       - name: Run tests
         run: mvn clean test

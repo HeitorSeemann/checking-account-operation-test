@@ -36,9 +36,10 @@ jobs:
             docker compose up -d || true
           fi
 
-      - name: Wait for API to be ready
+      - name: Wait for API to be fully ready
         run: |
-          sleep 15
+          echo "Waiting for API endpoints to become available..."
+          timeout 90s sh -c 'until curl -f http://localhost:8080/actuator/health || curl -f http://localhost:8080/health || curl -f http://127.0.0; do sleep 5; done' || echo "Proceeding to tests, target may be slow..."
 
       - name: Run tests
         run: mvn clean test

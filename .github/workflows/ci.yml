@@ -103,22 +103,20 @@ jobs:
         run: mvn clean test -Dtest=!KafkaWithdrawalFunctionalTest
         continue-on-error: true
 
-      - name: Install K6 Engine and Execute Performance Stress Tests
+      - name: Download Standalone K6 and Execute Performance Stress Tests
         run: |
           if [ -d performance-tests ]; then
-            echo "Installing K6 binary via direct armored repository keys..."
-            sudo mkdir -p /usr/share/keyrings
-            curl -fsSL https://k6.io | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
-            echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://k6.io stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-            sudo apt-get update
-            sudo apt-get install k6 -y
+            echo "Downloading static standalone K6 Linux package..."
+            curl -o k6-standalone.tar.gz -L https://github.com
+            tar -xzf k6-standalone.tar.gz
+            sudo cp k6-v0.51.0-linux-amd64/k6 /usr/local/bin/
           
             cd performance-tests
             K6_SCRIPT=$(find . -name "*.js" | head -n 1)
             if [ ! -z "$K6_SCRIPT" ]; then
-              echo "Ajustando alvo de rede no script para loops locais de CI..."
+              echo "Patching destination endpoints inside execution targets..."
               sed -i 's/localhost:8080/127.0.0.1:8080/g' "$K6_SCRIPT"
-              echo "Executing load sequence on $K6_SCRIPT..."
+              echo "Executing standalone load metrics collection sequence..."
               k6 run "$K6_SCRIPT" > ../k6-results.log 2>&1 || true
             else
               echo "No JavaScript scenario files located inside performance-tests/" > ../k6-results.log

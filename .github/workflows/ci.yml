@@ -116,6 +116,8 @@ jobs:
             cd performance-tests
             K6_SCRIPT=$(find . -name "*.js" | head -n 1)
             if [ ! -z "$K6_SCRIPT" ]; then
+              echo "Ajustando alvo de rede no script para loops locais de CI..."
+              sed -i 's/localhost:8080/127.0.0.1:8080/g' "$K6_SCRIPT"
               echo "Executing load sequence on $K6_SCRIPT..."
               k6 run "$K6_SCRIPT" > ../k6-results.log 2>&1 || true
             else

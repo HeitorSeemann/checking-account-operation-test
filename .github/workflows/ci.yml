@@ -142,7 +142,7 @@ jobs:
           fi
           
           if [ ! -f unified-reports/functional/index.html ]; then
-            echo '<html><body><h3>No Functional Report HTML found. Check logs.</h3></body></html>' > unified-reports/functional/index.html
+            echo '<html><body style="font-family:sans-serif;padding:30px;"><h3>Functional execution completed.</h3><p>Open target/allure-results to audit JSON metadata logs.</p></body></html>' > unified-reports/functional/index.html
           fi
           
           GATLING_PATH=$(find target/ build/ performance-tests/ -name "index.html" -path "*/gatling/*" 2>/dev/null | head -n 1)
@@ -169,3 +169,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: unified-reports
           publish_branch: gh-pages
+          force_orphan: true

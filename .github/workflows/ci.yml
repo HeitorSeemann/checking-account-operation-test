@@ -117,18 +117,30 @@ jobs:
           fi
         continue-on-error: true
 
-      - name: Install Allure CLI and Compile HTML Dashboards
+      - name: Load Historical Metrics from Pages
+        uses: actions/checkout@v4
+        if: always()
+        with:
+          ref: gh-pages
+          path: gh-pages-dir
+        continue-on-error: true
+
+      - name: Compile Allure Functional HTML Dashboard
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: target/allure-results
+          allure_history: allure-history
+          keep_reports: 20
+
+      - name: Consolidate Functional and Performance Reports
         if: always()
         run: |
           mkdir -p unified-reports/functional
           mkdir -p unified-reports/performance
           
-          curl -o allure-commandline.zip -L https://github.com
-          unzip allure-commandline.zip
-          export PATH=$PATH:$(pwd)/allure-2.29.0/bin
-          
-          if [ -d target/allure-results ]; then
-            allure generate target/allure-results -o unified-reports/functional --clean
+          if [ -d allure-history ]; then
+            cp -r allure-history/* unified-reports/functional/
           fi
           
           GATLING_DIR_BUILD=$(find performance-tests/build/reports/gatling -maxdepth 1 -mindepth 1 -type d 2>/dev/null | head -n 1)

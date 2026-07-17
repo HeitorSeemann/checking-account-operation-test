@@ -62,6 +62,9 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
+      - name: Setup K6 Performance Engine
+        uses: grafana/setup-k6-action@v1
+
       - name: Wait for Kafka Broker Readiness
         run: |
           timeout 60s sh -c 'until nc -z 127.0.0.1 9092; do sleep 2; done'
@@ -103,20 +106,15 @@ jobs:
         run: mvn clean test -Dtest=!KafkaWithdrawalFunctionalTest
         continue-on-error: true
 
-      - name: Download Stable K6 Bundle and Execute Performance Stress Tests
+      - name: Execute K6 Performance Stress Tests
         run: |
           if [ -d performance-tests ]; then
-            echo "Downloading static standalone K6 Linux bundle from GitHub Releases mirror..."
-            curl -L -o k6-standalone.tar.gz https://github.com
-            tar -xzf k6-standalone.tar.gz
-            sudo cp k6-v0.51.0-linux-amd64/k6 /usr/local/bin/
-          
             cd performance-tests
             K6_SCRIPT=$(find . -name "*.js" | head -n 1)
             if [ ! -z "$K6_SCRIPT" ]; then
               echo "Patching destination endpoints inside execution targets..."
               sed -i 's/localhost:8080/127.0.0.1:8080/g' "$K6_SCRIPT"
-              echo "Executing standalone load metrics collection sequence..."
+              echo "Executing automated load metrics collection sequence..."
               k6 run "$K6_SCRIPT" > ../k6-results.log 2>&1 || true
             else
               echo "No JavaScript scenario files located inside performance-tests/" > ../k6-results.log

@@ -25,6 +25,8 @@
         <allure.version>2.15.0</allure.version>
         <allure-maven.version>2.10.0</allure-maven.version>
         <lombok.version>1.18.44</lombok.version>
+        <gatling.version>3.9.5</gatling.version>
+        <gatling-maven-plugin.version>4.3.0</gatling-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -116,9 +118,16 @@
             <artifactId>gson</artifactId>
             <version>2.8.5</version>
         </dependency>
+        <dependency>
+            <groupId>io.gatling.highcharts</groupId>
+            <artifactId>gatling-charts-highcharts</artifactId>
+            <version>${gatling.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -144,6 +153,15 @@
                 <version>${allure-maven.version}</version>
                 <configuration>
                     <reportVersion>${allure.version}</reportVersion>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>io.gatling</groupId>
+                <artifactId>gatling-maven-plugin</artifactId>
+                <version>${gatling-maven-plugin.version}</version>
+                <configuration>
+                    <simulationsFolder>performance-tests</simulationsFolder>
+                    <reportsConfigFile>performance-tests/gatling.conf</reportsConfigFile>
                 </configuration>
             </plugin>
             <plugin>

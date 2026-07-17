@@ -136,11 +136,13 @@ jobs:
       - name: Consolidate Functional and Performance Reports
         if: always()
         run: |
+          mkdir -p unified-reports/functional
           mkdir -p unified-reports/performance
+          touch unified-reports/.nojekyll
           
           if [ -d allure-history ]; then
             sudo chmod -R 777 allure-history
-            cp -r allure-history unified-reports/functional
+            cp -r allure-history/* unified-reports/functional/
           fi
           
           GATLING_DIR_BUILD=$(find performance-tests/build/reports/gatling -maxdepth 1 -mindepth 1 -type d 2>/dev/null | head -n 1)

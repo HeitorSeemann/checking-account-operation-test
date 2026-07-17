@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://apache.org http://apache.org">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.pereira.contacorrente</groupId>
+    <groupId>com.heitor.checkingacoountoperation</groupId>
     <artifactId>restassured-operacao-conta-corrente-automacao</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 

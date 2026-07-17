@@ -72,7 +72,7 @@ jobs:
             cat app.log
           fi
 
-      - name: Execute RestAssured Automation Tests Excluding Kafka
+      - name: Execute RestAssured Automation Tests
         run: mvn clean test -Dtest=!KafkaWithdrawalFunctionalTest
         continue-on-error: true
 

@@ -19,7 +19,6 @@ import static java.util.UUID.randomUUID;
 import static org.apache.http.HttpStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(AllureJunit5.class)
 @TestMethodOrder(OrderAnnotation.class)
 class KafkaWithdrawalFunctionalTest {
 

@@ -36,6 +36,7 @@ jobs:
           KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
           KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
           KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+          KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
     steps:
       - name: Checkout Test Automation Repository
@@ -61,14 +62,10 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Wait for Kafka Broker and Provision Core Topics
+      - name: Wait for Kafka Broker Readiness
         run: |
           echo "Waiting for Kafka network sockets to accept connections..."
           timeout 60s sh -c 'until nc -z 127.0.0.1 9092; do sleep 2; done'
-          echo "Finding active Kafka container ID..."
-          KAFKA_CONTAINER_ID=$(docker ps --filter "ancestor=confluentinc/cp-kafka:7.3.0" --format "{{.ID}}")
-          echo "Provisioning checking account core topics inside container $KAFKA_CONTAINER_ID..."
-          docker exec $KAFKA_CONTAINER_ID kafka-topics --bootstrap-server 127.0.0.1:9092 --create --topic account-withdrawals --partitions 1 --replication-factor 1 --if-not-exists
 
       - name: Clean Local Environment Hardcoded Paths
         run: |

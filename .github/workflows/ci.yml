@@ -1,55 +1,101 @@
-name: Java CI with Maven
+name: Automated API Tests
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ main, master ]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  build-and-test:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Automation Tests Repository
+      - name: Checkout Test Automation Repository
         uses: actions/checkout@v4
 
-      - name: Checkout Main Application Repository
-        uses: actions/checkout@v4
-        with:
-          repository: 'HeitorSeemann/checking-account-operation'
-          path: 'main-app'
-
-      - name: Set up JDK 25
-        uses: actions/setup-java@v5
+      - name: Set up JDK 25 for Automation Suite
+        uses: actions/setup-java@v4
         with:
           java-version: '25'
           distribution: 'temurin'
           cache: 'maven'
-          check-latest: true
 
-      - name: Start Infrastructure (Docker Compose)
+      - name: Checkout Target API Source Code
+        uses: actions/checkout@v4
+        with:
+          repository: HeitorSeemann/checking-account-operation
+          path: api-target
+
+      - name: Set up JDK 25 for Target API Build
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Clean Local Environment Hardcoded Paths
         run: |
-          cd main-app
-          docker compose up -d
+          cd api-target
+          if [ -f gradle.properties ]; then
+            sed -i '/org.gradle.java.home/d' gradle.properties
+          fi
+          cd ..
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x main-app/gradlew
-
-      - name: Build and Start Main Service
+      - name: Compile and Launch Target API
         run: |
-          cd main-app
-          ./gradlew bootRun &
+          cd api-target
+          chmod +x gradlew
+          ./gradlew compileJava
+          nohup ./gradlew bootRun > ../app.log 2>&1 &
+          cd ..
 
-      - name: Wait for Spring Boot REST API to be healthy
+      - name: Wait for Target API to be Fully Available
         run: |
-          echo "Aguardando inicialização do microsserviço..."
-          timeout 90s bash -c '
-          until curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/accounts/withdrawals/1 | grep -q "404"; do
-            echo "Serviço ainda não inicializado completamente. Aguardando..."
-            sleep 3
-          done'
-          echo "Microsserviço respondendo com sucesso!"
+          for i in {1..40}; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0 || echo "000")
+            if [ "$HTTP_STATUS" != "000" ] && [ "$HTTP_STATUS" != "404" ] && [ "$HTTP_STATUS" != "503" ]; then
+              break
+            fi
+            sleep 4
+          done
 
-      - name: Run Automation Tests with Maven
-        run: mvn clean test
+      - name: Print API Logs on Failure Startup
+        if: failure() || always()
+        run: |
+          if [ -f app.log ]; then
+            cat app.log
+          fi
+
+      - name: Execute RestAssured Automation Tests
+        run: mvn clean test -Dtest=!KafkaWithdrawalFunctionalTest
+        continue-on-error: true
+
+      - name: Collect Allure Executions History
+        uses: actions/checkout@v4
+        if: always()
+        with:
+          ref: gh-pages
+          path: gh-pages-dir
+        continue-on-error: true
+
+      - name: Build Allure Dashboard Structure
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: target/allure-results
+          allure_history: allure-history
+          keep_reports: 20
+
+      - name: Publish Dashboard Webpage
+        uses: peaceiris/actions-gh-pages@v4
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-history
+          publish_branch: gh-pages

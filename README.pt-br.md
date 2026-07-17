@@ -24,7 +24,7 @@ Ele cobre testes funcionais de API, testes com Kafka, testes de estresse e valid
 
 ## ⚙️ Integração Contínua (CI)
 
-Este projeto inclui um workflow completo do **GitHub Actions** (`ci.yml`) que é executado a cada push e pull request nos branches `main` ou `master`.
+Este projeto inclui um workflow completo do **GitHub Actions** (`ci.yml`) que é executado a cada push e pull request nos branches `main` ou `master`. 
 
 Sempre que o código é atualizado, a pipeline executa automaticamente os seguintes passos:
 1. Faz o clone deste repositório de testes.

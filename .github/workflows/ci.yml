@@ -61,9 +61,18 @@ jobs:
           nohup ./gradlew bootRun --args='--spring.profiles.active=test' > app.log 2>&1 &
           cd ..
 
-      - name: Verify API Availability
+      - name: Wait for Target API to be Fully Available
         run: |
-          timeout 60s sh -c 'until curl -s http://localhost:8080/accounts/withdrawals/1001 || curl -s http://localhost:8080/health; do sleep 3; done' || echo "API initialization completed"
+          echo "Waiting for microservice Tomcat server to spin up on port 8080..."
+          for i in {1..30}; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/accounts/withdrawals/1001 || echo "000")
+            if [ "$HTTP_STATUS" != "000" ] && [ "$HTTP_STATUS" != "404" ] && [ "$HTTP_STATUS" != "503" ]; then
+              echo "Target API is operational with Status Code: $HTTP_STATUS"
+              break
+            fi
+            echo "Server is initializing... (Attempt $i/30)"
+            sleep 3
+          done
 
       - name: Execute RestAssured Automation Tests
         run: mvn clean test

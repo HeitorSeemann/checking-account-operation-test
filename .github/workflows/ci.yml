@@ -28,7 +28,6 @@ jobs:
         image: confluentinc/cp-kafka:7.3.0
         ports:
           - 9092:9092
-          - 29092:29092
         env:
           KAFKA_BROKER_ID: 1
           KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -54,6 +53,11 @@ jobs:
         with:
           repository: HeitorSeemann/checking-account-operation
           path: api-target
+
+      - name: Wait for Kafka Broker Readiness
+        run: |
+          echo "Waiting for Kafka network sockets to accept connections..."
+          timeout 60s sh -c 'until nc -z localhost 9092; do sleep 2; done'
 
       - name: Launch Target API via BootRun
         run: |

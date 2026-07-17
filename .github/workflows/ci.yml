@@ -61,6 +61,14 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
+      - name: Clean Local Environment Hardcoded Paths
+        run: |
+          cd api-target
+          if [ -f gradle.properties ]; then
+            sed -i '/org.gradle.java.home/d' gradle.properties
+          fi
+          cd ..
+
       - name: Compile and Launch Target API
         run: |
           cd api-target

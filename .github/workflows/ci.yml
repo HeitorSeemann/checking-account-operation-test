@@ -24,19 +24,6 @@ jobs:
         ports:
           - 2181:2181
 
-      kafka:
-        image: confluentinc/cp-kafka:7.3.0
-        ports:
-          - 9092:9092
-        env:
-          KAFKA_BROKER_ID: 1
-          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
-          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-          KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-          KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-
     steps:
       - name: Checkout Test Automation Repository
         uses: actions/checkout@v4
@@ -61,6 +48,16 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
+      - name: Launch Kafka manually on Host Network
+        run: |
+          docker run -d --name kafka-host --net=host \
+            -e KAFKA_BROKER_ID=1 \
+            -e KAFKA_ZOOKEEPER_CONNECT=localhost:2181 \
+            -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092 \
+            -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT \
+            -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+            confluentinc/cp-kafka:7.3.0
+
       - name: Clean Local Environment Hardcoded Paths
         run: |
           cd api-target
@@ -74,20 +71,20 @@ jobs:
           cd api-target
           chmod +x gradlew
           ./gradlew compileJava
-          nohup ./gradlew bootRun --args='--spring.kafka.bootstrap-servers=localhost:9092' > ../app.log 2>&1 &
+          nohup ./gradlew bootRun --args='--spring.kafka.bootstrap-servers=127.0.0.1:9092' > ../app.log 2>&1 &
           cd ..
 
       - name: Wait for Target API to be Fully Available
         run: |
           echo "Waiting for microservice Tomcat server to spin up on port 8080..."
           for i in {1..40}; do
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/accounts/withdrawals/1001 || echo "000")
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0 || echo "000")
             if [ "$HTTP_STATUS" != "000" ] && [ "$HTTP_STATUS" != "404" ] && [ "$HTTP_STATUS" != "503" ]; then
               echo "Target API is operational with Status Code: $HTTP_STATUS"
               break
             fi
             echo "Server is initializing... (Attempt $i/40)"
-            sleep 3
+            sleep 4
           done
 
       - name: Print API Logs on Failure Startup

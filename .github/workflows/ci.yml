@@ -130,70 +130,34 @@ jobs:
         if: always()
         with:
           allure_results: target/allure-results
-          allure_report: functional
           allure_history: allure-history
           keep_reports: 20
 
-      - name: Consolidate Performance Reports and Create Index Menu
+      - name: Consolidate Functional and Performance Reports
         if: always()
         run: |
-          mkdir -p functional
-          mkdir -p performance
+          mkdir -p unified-reports/performance
           
           if [ -d allure-history ]; then
-            cp -r allure-history/* functional/
+            sudo chmod -R 777 allure-history
+            cp -r allure-history unified-reports/functional
           fi
           
           GATLING_DIR_BUILD=$(find performance-tests/build/reports/gatling -maxdepth 1 -mindepth 1 -type d 2>/dev/null | head -n 1)
           GATLING_DIR_TARGET=$(find performance-tests/target/gatling -maxdepth 1 -mindepth 1 -type d 2>/dev/null | head -n 1)
           
           if [ ! -z "$GATLING_DIR_BUILD" ]; then
-            cp -r "$GATLING_DIR_BUILD"/* performance/
+            cp -r "$GATLING_DIR_BUILD"/* unified-reports/performance/
           elif [ ! -z "$GATLING_DIR_TARGET" ]; then
-            cp -r "$GATLING_DIR_TARGET"/* performance/
+            cp -r "$GATLING_DIR_TARGET"/* unified-reports/performance/
           fi
           
-          cat << 'EOF' > index.html
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Checking Account Automation Dashboards</title>
-              <style>
-                  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; }
-                  h1 { color: #1e293b; margin-bottom: 30px; font-size: 2.5rem; text-align: center; }
-                  .container { display: flex; gap: 30px; max-width: 900px; width: 100%; flex-wrap: wrap; justify-content: center; }
-                  .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); padding: 30px; text-align: center; flex: 1; min-width: 280px; max-width: 400px; transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; color: inherit; }
-                  .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
-                  .icon { font-size: 3rem; margin-bottom: 15px; }
-                  .card h2 { color: #0f172a; margin: 0 0 10px 0; font-size: 1.5rem; }
-                  .card p { color: #64748b; margin: 0; font-size: 1rem; line-height: 1.5; }
-              </style>
-          </head>
-          <body>
-              <h1>Checking Account Automation Dashboards 🧪</h1>
-              <div class="container">
-                  <a href="./functional/" class="card">
-                      <div class="icon">📊</div>
-                      <h2>Functional API Reports</h2>
-                      <p>View RestAssured interactive execution graphs, historical evolution, and error classifications via Allure.</p>
-                  </a>
-                  <a href="./performance/" class="card">
-                      <div class="icon">⚡</div>
-                      <h2>Performance Stress Reports</h2>
-                      <p>Analyze microservice resilience, response time percentiles, and request-per-second capacities via Gatling.</p>
-                  </a>
-              </div>
-          </body>
-          </html>
-          EOF
+          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=functional/index.html"></head><body></body></html>' > unified-reports/index.html
 
       - name: Publish Unified Dashboards to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         if: always()
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
+          publish_dir: unified-reports
           publish_branch: gh-pages
-          keep_files: false

@@ -126,13 +126,12 @@ jobs:
         continue-on-error: true
 
       - name: Compile Allure Functional HTML Dashboard
-        uses: allure-framework/report-action@v2
+        uses: simple-elf/allure-report-action@master
         if: always()
         with:
-          allure-results: target/allure-results
-          allure-report: raw-functional-report
-          allure-history: allure-history
-          keep-reports: 20
+          allure_results: target/allure-results
+          allure_history: allure-history
+          keep_reports: 20
 
       - name: Consolidate Functional and Performance Reports
         if: always()
@@ -144,8 +143,9 @@ jobs:
           touch unified-reports/functional/.nojekyll
           touch unified-reports/performance/.nojekyll
           
-          if [ -d raw-functional-report ] && [ "$(ls -A raw-functional-report 2>/dev/null)" ]; then
-            cp -r raw-functional-report/* unified-reports/functional/
+          if [ -d allure-history ] && [ "$(ls -A allure-history 2>/dev/null)" ]; then
+            sudo chmod -R 777 allure-history
+            cp -r allure-history/* unified-reports/functional/
           else
             echo '<html><body><h3>No Functional Report Data Available</h3></body></html>' > unified-reports/functional/index.html
           fi

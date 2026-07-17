@@ -93,10 +93,11 @@ jobs:
           done
 
       - name: Print API Logs on Failure Startup
-        if: failure() run: |
-                             if [ -f app.log ]; then
-                             cat app.log
-                             fi
+        if: always()
+        run: |
+          if [ -f app.log ]; then
+            cat app.log
+          fi
 
       - name: Execute RestAssured Automation Tests Excluding Kafka
         run: mvn clean test -Dtest=!KafkaWithdrawalFunctionalTest
@@ -130,12 +131,13 @@ jobs:
             allure generate target/allure-results -o unified-reports/functional --clean
           fi
           
-          if [ -d performance-tests/build/reports/gatling ]; then
-            LATEST_GATLING=$(ls -td performance-tests/build/reports/gatling/*/ | head -1)
-            cp -r ${LATEST_GATLING}* unified-reports/performance/
-          elif [ -d performance-tests/target/gatling ]; then
-            LATEST_GATLING=$(ls -td performance-tests/target/gatling/*/ | head -1)
-            cp -r ${LATEST_GATLING}* unified-reports/performance/
+          GATLING_DIR_BUILD=$(find performance-tests/build/reports/gatling -maxdepth 1 -mindepth 1 -type d 2>/dev/null | head -n 1)
+          GATLING_DIR_TARGET=$(find performance-tests/target/gatling -maxdepth 1 -mindepth 1 -type d 2>/dev/null | head -n 1)
+          
+          if [ ! -z "$GATLING_DIR_BUILD" ]; then
+            cp -r "$GATLING_DIR_BUILD"/* unified-reports/performance/
+          elif [ ! -z "$GATLING_DIR_TARGET" ]; then
+            cp -r "$GATLING_DIR_TARGET"/* unified-reports/performance/
           fi
 
       - name: Publish Unified Dashboards to GitHub Pages

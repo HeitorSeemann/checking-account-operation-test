@@ -15,15 +15,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      zookeeper:
-        image: confluentinc/cp-zookeeper:7.3.0
-        env:
-          ZOOKEEPER_CLIENT_PORT: 2181
-          ZOOKEEPER_TICK_TIME: 2000
-        ports:
-          - 2181:2181
-
     steps:
       - name: Checkout Test Automation Repository
         uses: actions/checkout@v4
@@ -48,11 +39,18 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Launch Kafka manually on Host Network
+      - name: Launch Zookeeper and Kafka on Host Network
         run: |
+          docker run -d --name zookeeper-host --net=host \
+            -e ZOOKEEPER_CLIENT_PORT=2181 \
+            -e ZOOKEEPER_TICK_TIME=2000 \
+            confluentinc/cp-zookeeper:7.3.0
+          
+          sleep 5
+          
           docker run -d --name kafka-host --net=host \
             -e KAFKA_BROKER_ID=1 \
-            -e KAFKA_ZOOKEEPER_CONNECT=localhost:2181 \
+            -e KAFKA_ZOOKEEPER_CONNECT=127.0.0.1:2181 \
             -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092 \
             -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT \
             -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
@@ -60,7 +58,9 @@ jobs:
 
       - name: Wait for Kafka and Provision Core Topics
         run: |
-          timeout 30s sh -c 'until docker exec kafka-host kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --list > /dev/null 2>&1; do sleep 2; done'
+          echo "Waiting for Kafka broker to start accepting topics..."
+          timeout 45s sh -c 'until docker exec kafka-host kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --list > /dev/null 2>&1; do sleep 2; done'
+          echo "Provisioning checking account core topics..."
           docker exec kafka-host kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --create --topic account-withdrawals --partitions 1 --replication-factor 1 --if-not-exists
 
       - name: Clean Local Environment Hardcoded Paths

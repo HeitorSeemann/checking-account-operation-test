@@ -93,7 +93,7 @@ jobs:
           done
 
       - name: Print API Logs on Failure Startup
-        if: always()
+        if: failure()
         run: |
           if [ -f app.log ]; then
             cat app.log
@@ -123,8 +123,8 @@ jobs:
           mkdir -p unified-reports/functional
           mkdir -p unified-reports/performance
           
-          curl -o allure-commandline.tgz -L https://apache.org
-          tar -zxvf allure-commandline.tgz
+          curl -o allure-commandline.zip -L https://github.com
+          unzip allure-commandline.zip
           export PATH=$PATH:$(pwd)/allure-2.29.0/bin
           
           if [ -d target/allure-results ]; then

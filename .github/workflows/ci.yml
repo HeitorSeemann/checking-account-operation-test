@@ -156,6 +156,14 @@ jobs:
           
           echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=functional/index.html"></head><body></body></html>' > unified-reports/index.html
 
+      - name: Upload Test Reports as Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-execution-reports
+          path: unified-reports/
+          retention-days: 5
+
       - name: Publish Unified Dashboards to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         if: always()

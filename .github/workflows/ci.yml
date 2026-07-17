@@ -41,7 +41,7 @@ jobs:
       - name: Checkout Test Automation Repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 25
+      - name: Set up JDK 25 for Automation Suite
         uses: actions/setup-java@v4
         with:
           java-version: '25'
@@ -54,28 +54,31 @@ jobs:
           repository: HeitorSeemann/checking-account-operation
           path: api-target
 
-      - name: Wait for Kafka Broker Readiness
-        run: |
-          echo "Waiting for Kafka network sockets to accept connections..."
-          timeout 60s sh -c 'until nc -z localhost 9092; do sleep 2; done'
+      - name: Set up JDK 25 for Target API Build
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'gradle'
 
-      - name: Launch Target API via BootRun
+      - name: Compile and Launch Target API
         run: |
           cd api-target
           chmod +x gradlew
-          nohup ./gradlew bootRun --args='--spring.profiles.active=test --spring.kafka.bootstrap-servers=localhost:9092' > ../app.log 2>&1 &
+          ./gradlew compileJava
+          nohup ./gradlew bootRun --args='--spring.kafka.bootstrap-servers=localhost:9092' > ../app.log 2>&1 &
           cd ..
 
       - name: Wait for Target API to be Fully Available
         run: |
           echo "Waiting for microservice Tomcat server to spin up on port 8080..."
-          for i in {1..30}; do
+          for i in {1..40}; do
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/accounts/withdrawals/1001 || echo "000")
             if [ "$HTTP_STATUS" != "000" ] && [ "$HTTP_STATUS" != "404" ] && [ "$HTTP_STATUS" != "503" ]; then
               echo "Target API is operational with Status Code: $HTTP_STATUS"
               break
             fi
-            echo "Server is initializing... (Attempt $i/30)"
+            echo "Server is initializing... (Attempt $i/40)"
             sleep 3
           done
 

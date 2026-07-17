@@ -28,6 +28,7 @@ jobs:
         image: confluentinc/cp-kafka:7.3.0
         ports:
           - 9092:9092
+          - 29092:29092
         env:
           KAFKA_BROKER_ID: 1
           KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -58,7 +59,7 @@ jobs:
         run: |
           cd api-target
           chmod +x gradlew
-          nohup ./gradlew bootRun --args='--spring.profiles.active=test' > app.log 2>&1 &
+          nohup ./gradlew bootRun --args='--spring.profiles.active=test --spring.kafka.bootstrap-servers=localhost:9092' > ../app.log 2>&1 &
           cd ..
 
       - name: Wait for Target API to be Fully Available
@@ -73,6 +74,14 @@ jobs:
             echo "Server is initializing... (Attempt $i/30)"
             sleep 3
           done
+
+      - name: Print API Logs on Failure Startup
+        if: failure() || always()
+        run: |
+          if [ -f app.log ]; then
+            echo "=== TARGET API STARTUP LOGS ==="
+            cat app.log
+          fi
 
       - name: Execute RestAssured Automation Tests
         run: mvn clean test

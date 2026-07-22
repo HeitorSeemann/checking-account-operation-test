@@ -102,6 +102,10 @@ jobs:
             cat app.log
           fi
 
+      - name: Execute RestAssured Automation Tests Excluding Kafka
+        run: mvn clean test -Dtest=!KafkaWithdrawalFunctionalTest
+        continue-on-error: true
+
       - name: Execute K6 Performance Stress Tests
         run: |
           if [ -d performance-tests ]; then
@@ -117,14 +121,6 @@ jobs:
             fi
             cd ..
           fi
-        continue-on-error: true
-
-      - name: Execute RestAssured Automation Tests Excluding Kafka
-        run: mvn clean test -Dtest=!KafkaWithdrawalFunctionalTest,!KafkaInfrastructureChaosTest
-        continue-on-error: true
-
-      - name: Execute Kafka Infrastructure Chaos Test 🌀
-        run: mvn test -Dtest=KafkaInfrastructureChaosTest
         continue-on-error: true
 
       - name: Generate Allure Report HTML via Maven

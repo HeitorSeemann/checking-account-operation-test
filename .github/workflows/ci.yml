@@ -87,12 +87,15 @@ jobs:
 
       - name: Wait for Target API to be Fully Available
         run: |
+          echo "Aguardando a resposta HTTP da API na porta 8080..."
           for i in {1..40}; do
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0 || echo "000")
-            if [ "$HTTP_STATUS" != "000" ] && [ "$HTTP_STATUS" != "404" ] && [ "$HTTP_STATUS" != "503" ]; then
+            echo "Tentativa $i: Status HTTP retornado = $HTTP_STATUS"
+            if [ "$HTTP_STATUS" = "200" ]; then
+              echo "API online e saudável!"
               break
             fi
-            sleep 4
+            sleep 3
           done
 
       - name: Print API Logs on Failure Startup

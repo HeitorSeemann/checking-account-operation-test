@@ -23,11 +23,9 @@
         <allure.version>2.15.0</allure.version>
         <allure-maven.version>2.10.0</allure-maven.version>
         <lombok.version>1.18.44</lombok.version>
-        <!-- Versão adicionada para o Docker Java -->
         <docker-java.version>3.4.0</docker-java.version>
     </properties>
     <dependencies>
-        <!-- DEPENDÊNCIAS ADICIONADAS PARA CONECTAR NO DOCKER (ABORDAGEM 2) -->
         <dependency>
             <groupId>com.github.docker-java</groupId>
             <artifactId>docker-java-core</artifactId>
@@ -41,7 +39,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- SUAS DEPENDÊNCIAS ORIGINAIS MANTIDAS INTEGRAIS -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>

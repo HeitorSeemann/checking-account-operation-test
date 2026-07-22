@@ -3,13 +3,13 @@
 _Leia este arquivo em outro idioma: [English](README.md)_
 
 Este repositório contém a suíte de testes automatizados para o microsserviço **checking-account-operation**, URL: https://github.com
-
-O projeto cobre testes funcionais de API, testes de estresse e validação de arquiteturas baseadas em eventos.
+O projeto cobre testes funcionais de API, testes de estresse, engenharia de resiliência com caos e validação de arquiteturas baseadas em eventos.
 
 ## 🚀 Funcionalidades Principais
 
 * **Automação de API:** Testes de integração robustos e abrangentes utilizando **RestAssured**.
 * **Testes de Estresse:** Validação de performance e resiliência sob alta carga usando o **K6 Engine**.
+* **Engenharia de Caos:** Orquestração de injeção de falhas de infraestrutura real via **Docker Java API**.
 * **Validações Estruturadas:** Checagem avançada de payloads JSON, regras de otimização de cédulas e códigos de status HTTP.
 * **Integração CI/CD:** Pipeline de execução fim a fim totalmente automatizado via GitHub Actions.
 * **Hub Unificado de Relatórios:** Painéis HTML interativos para métricas funcionais e resumos de telemetria publicados automaticamente na web.
@@ -20,13 +20,14 @@ O projeto cobre testes funcionais de API, testes de estresse e validação de ar
 * **JavaScript** - Linguagem utilizada para os scripts de simulação e carga de performance.
 * **RestAssured** - Framework para automação e validação de APIs REST.
 * **K6 Engine** - Ferramenta moderna e de código aberto para testes de carga nativos em nuvem.
+* **Docker Java API** - Biblioteca cliente para manipulação de infraestrutura em tempo de execução.
 * **Maven** - Gerenciador de dependências e executor do ciclo de testes funcionais.
 * **Kafka & Zookeeper** - Infraestrutura de mensageria assíncrona orientada a eventos.
 * **Docker** - Conteinerização para orquestração isolada das dependências de infraestrutura.
 * **GitHub Actions** - Plataforma de Integração Contínua (CI).
 * **Allure Report** - Framework para geração de relatórios ricos e colaborativos.
 
-## ⚙️ Integração Contínua (CI)
+## ⚙️ Integração Continua (CI)
 
 Este projeto inclui um workflow do **GitHub Actions** totalmente automatizado (`ci.yml`) que é disparado a cada push e pull request para as branches `main` ou `master`. Sempre que o código é atualizado, o pipeline executa as seguintes etapas:
 
@@ -37,9 +38,10 @@ Este projeto inclui um workflow do **GitHub Actions** totalmente automatizado (`
 5. Sobe o **Kafka**, **Zookeeper** e a **API Spring Boot**.
 6. Aguarda até que todos os serviços fiquem saudáveis e disponíveis.
 7. Executa a suíte de testes funcionais do RestAssured via Maven.
-8. Configura o Grafana **K6 Engine** para rodar os cenários de testes de performance em JavaScript.
-9. Consolida as métricas de ambas as execuções em um espaço de trabalho isolado.
-10. Gera um artefato ZIP independente e publica o **Hub de Automação** web diretamente no **GitHub Pages**.
+8. Executa os cenários de injeção de caos na infraestrutura através de gatilhos programáticos.
+9. Configura o Grafana **K6 Engine** para rodar os cenários de testes de performance em JavaScript.
+10. Consolida as métricas de todas as execuções em um espaço de trabalho isolado.
+11. Gera um artefato ZIP independente e publica o **Hub de Automação** web diretamente no **GitHub Pages**.
 
 ---
 
@@ -69,13 +71,18 @@ mvn clean test
 mvn test -Dtest=NomeDaClasseTest
 ```
 
-4. **Executar os testes de estresse do K6 localmente:**
+4. **Executar os testes de engenharia de caos especificamente:**
+```bash
+mvn test -Dtest=KafkaInfrastructureChaosTest
+```
+
+5. **Executar os testes de estresse do K6 localmente:**
 ```bash
 cd performance-tests
 k6 run nome_do_seu_script.js
 ```
 
-5. **Gerar e abrir o Allure Report localmente:**
+6. **Gerar e abrir o Allure Report localmente:**
 ```bash
 mvn allure:serve
 ```
@@ -87,8 +94,8 @@ mvn allure:serve
 Assim que a execução do pipeline automatizado terminar com sucesso, os relatórios hospedados de forma independente estarão disponíveis no seu ambiente de implantação em nuvem:
 
 * **Link do Hub de Automação Unificado (Índice Raiz):** `https://github.io`
-* **Relatórios de Testes Funcionais (Dashboard Allure):** `https://github.iofunctional/index.html`
-* **Relatórios de Estresse de Performance (Log de Resumo K6):** `https://github.ioperformance/index.html`
+* **Relatórios de Testes Funcionais (Dashboard Allure):** `https://github.io`
+* **Relatórios de Estresse de Performance (Log de Resumo K6):** `https://github.io`
 
 ---
 

@@ -89,7 +89,7 @@ jobs:
         run: |
           for i in {1..40}; do
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0 || echo "000")
-            if [ "$HTTP_STATUS" != "000" ] && [ "$Dashboard_STATUS" != "404" ] && [ "$HTTP_STATUS" != "503" ]; then
+            if [ "$HTTP_STATUS" != "000" ] && [ "$HTTP_STATUS" != "404" ] && [ "$HTTP_STATUS" != "503" ]; then
               break
             fi
             sleep 4
@@ -149,7 +149,7 @@ jobs:
             echo '<html><body style="font-family:sans-serif;padding:30px;"><h3>Functional execution completed.</h3><p>Open target/allure-results to audit JSON metadata logs.</p></body></html>' > unified-reports/functional/index.html
           fi
           if [ -f k6-results.log ]; then
-            echo "<html><body style=\"font-family:monospace;padding:30px;background:#1e1e1e;color:#fff;\"><h2>K6 Performance Execution Metrics Summary</h2><pre>$(head -n 500 ../k6-results.log)</pre></body></html>" > unified-reports/performance/index.html
+            echo "<html><body style=\"font-family:monospace;padding:30px;background:#1e1e1e;color:#fff;\"><h2>K6 Performance Execution Metrics Summary</h2><pre>$(tail -n 300 k6-results.log)</pre></body></html>" > unified-reports/performance/index.html
           else
             echo '<html><body><h3>No Performance Metrics Compiled. Check workflow runner logs.</h3></body></html>' > unified-reports/performance/index.html
           fi

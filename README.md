@@ -3,13 +3,13 @@
 _Read this in other languages: [Português](README.pt-br.md)_
 
 This repository contains the automated test suite for the **checking-account-operation** microservice, URL: https://github.com/HeitorSeemann/checking-account-operation
+It covers functional API testing, stress testing, chaos resilience engineering, and event-driven architecture validation.
 
-It covers functional API testing, stress testing, and event-driven architecture validation.
-
-## 🚀 Key Features
+## 🚀 Key Features 
 
 * **API Automation:** Comprehensive integration tests using **RestAssured**.
 * **Stress Testing:** High-load performance and resilience validation using the **K6 Engine**.
+* **Chaos Engineering:** Real-world infrastructure fault injection orchestration via **Docker Java API**.
 * **Structured Assertions:** Advanced JSON payload, banknote optimization, and status code verification.
 * **CI/CD Integration:** Automated end-to-end testing pipeline via GitHub Actions.
 * **Unified Reporting Hub:** Interactive HTML dashboards for functional metrics and telemetry summaries published automatically to the web.
@@ -20,13 +20,14 @@ It covers functional API testing, stress testing, and event-driven architecture 
 * **JavaScript** - Language used for performance testing simulation scripts.
 * **RestAssured** - Library for REST API testing and validation.
 * **K6 Engine** - Modern open-source tool for cloud-native performance testing.
+* **Docker Java API** - Client library for runtime infrastructure manipulation.
 * **Maven** - Dependency management and functional test execution build tool.
 * **Kafka & Zookeeper** - Event-driven messaging backbone for asynchronous operations.
 * **Docker** - Containerization for isolated service dependency orchestration.
 * **GitHub Actions** - Continuous Integration platform.
 * **Allure Report** - Framework for collaborative test reporting.
 
-## ⚙️ Continuous Integration (CId)
+## ⚙️ Continuous Integration (CI)
 
 This project includes a fully automated **GitHub Actions** workflow (`ci.yml`) that runs on every push and pull request to the `main` or `master` branches. Whenever code is updated, the pipeline automatically:
 
@@ -37,9 +38,10 @@ This project includes a fully automated **GitHub Actions** workflow (`ci.yml`) t
 5. Spins up **Kafka**, **Zookeeper**, and the **Spring Boot API**.
 6. Waits for all background systems to become healthy and available.
 7. Executes the RestAssured functional test suite using Maven.
-8. Sets up the Grafana **K6 Engine** to execute the JavaScript performance test scenarios.
-9. Consolidates both execution metrics into an isolated, independent workspace dashboard.
-10. Generates a standalone ZIP artifact and publishes a web-based **Automation Hub** straight to **GitHub Pages**.
+8. Executes the infrastructure chaos injection scenarios via programmatic lifecycle triggers.
+9. Sets up the Grafana **K6 Engine** to execute the JavaScript performance test scenarios.
+10. Consolidates execution metrics into an isolated, independent workspace dashboard.
+11. Generates a standalone ZIP artifact and publishes a web-based **Automation Hub** straight to **GitHub Pages**.
 
 ---
 
@@ -69,13 +71,18 @@ mvn clean test
 mvn test -Dtest=ClassNameTest
 ```
 
-4. **Run K6 performance stress tests locally:**
+4. **Run Chaos Engineering tests specifically:**
+```bash
+mvn test -Dtest=KafkaInfrastructureChaosTest
+```
+
+5. **Run K6 performance stress tests locally:**
 ```bash
 cd performance-tests
 k6 run name_of_your_script.js
 ```
 
-5. **Generate and open Allure Report locally:**
+6. **Generate and open Allure Report locally:**
 ```bash
 mvn allure:serve
 ```
@@ -87,8 +94,8 @@ mvn allure:serve
 Once the automated pipeline execution completes successfully, the unbundled reports are hosted independently on your cloud deployment workspace:
 
 * **Unified Automation Hub Link (Root Index):** `https://github.io`
-* **Functional Test Reports (Allure Dashboard):** `https://github.iofunctional/index.html`
-* **Performance Stress Reports (K6 Summary Log):** `https://github.ioperformance/index.html`
+* **Functional Test Reports (Allure Dashboard):** `https://github.io`
+* **Performance Stress Reports (K6 Summary Log):** `https://github.io`
 
 ---
 

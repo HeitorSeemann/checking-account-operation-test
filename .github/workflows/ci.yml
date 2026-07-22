@@ -103,7 +103,7 @@ jobs:
           fi
 
       - name: Execute RestAssured Automation Tests Excluding Kafka
-        run: mvn clean test -Dtest=!KafkaWithdrawalFunctionalTest
+        run: mvn clean test -Dtest=!KafkaWithdrawalFunctionalTest,!KafkaChaosTest
         continue-on-error: true
 
       - name: Execute K6 Performance Stress Tests

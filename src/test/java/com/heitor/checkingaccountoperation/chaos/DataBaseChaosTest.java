@@ -1,5 +1,6 @@
 package com.heitor.checkingaccountoperation.chaos;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
@@ -7,25 +8,22 @@ import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
 import com.heitor.checkingaccountoperation.client.CheckingAccountOperationClient;
-import com.heitor.checkingaccountoperation.dto.TransactionOutputDTO;
+import com.heitor.checkingaccountoperation.dto.TransactionInputDto;
 import com.heitor.checkingaccountoperation.event.Producer;
-import com.heitor.checkingaccountoperation.util.Util;
 import io.restassured.RestAssured;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import java.time.Duration;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.util.UUID.randomUUID;
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.apache.http.HttpStatus.*;
 
-public class KafkaChaosTest {
+public class DataBaseChaosTest {
 
     private static DockerClient dockerClient;
-    private static final String API_CONTAINER_NAME = "checking-account-app";
+    private static final String DB_CONTAINER_NAME = "checking_account_db";
     private CheckingAccountOperationClient checkingAccountOperationClient = new CheckingAccountOperationClient();
     private Producer producer = new Producer();
     public static final Integer ACCOUNT_ID = ThreadLocalRandom.current().nextInt(10000, 100000);
@@ -49,28 +47,30 @@ public class KafkaChaosTest {
     }
 
     @Test
-    public void shouldProcessMessageSentWhenApiIsDead() throws InterruptedException {
+    public void testApplicationResilienceAndSelfHealingWhenDatabaseRecovers() throws InterruptedException {
         try {
-            dockerClient.stopContainerCmd(API_CONTAINER_NAME).exec();
+            dockerClient.stopContainerCmd(DB_CONTAINER_NAME).exec();
             Thread.sleep(8000);
 
-            String jsonPayload = "{\"accountId\": " + ACCOUNT_ID + ", \"uuid\":\"" + UUID + "\", \"amount\": " + VALUE + "}";
-            producer.sendEvent("account-withdrawals", jsonPayload);
+            checkingAccountOperationClient
+                .postWithdrawals(String.valueOf(ACCOUNT_ID), new TransactionInputDto(VALUE), UUID)
+                .statusCode(SC_INTERNAL_SERVER_ERROR);
 
-            dockerClient.startContainerCmd(API_CONTAINER_NAME).exec();
-            Thread.sleep(26000);
+            dockerClient.startContainerCmd(DB_CONTAINER_NAME).exec();
+            Thread.sleep(31000);
 
-            Response response = checkingAccountOperationClient.getTrasanctions(String.valueOf(ACCOUNT_ID))
-                    .statusCode(SC_OK)
-                    .extract().response();
+            checkingAccountOperationClient
+                    .postWithdrawals(String.valueOf(ACCOUNT_ID), new TransactionInputDto(VALUE), UUID)
+                    .statusCode(SC_CREATED);
 
-            List<TransactionOutputDTO> list = Util.convertToListTransactionOutputDTO(response.getBody().print());
-            assertThat(list.get(0).getValue()).isEqualTo(VALUE);
-            assertThat(list.get(0).getAccount()).isEqualTo(ACCOUNT_ID);
+            checkingAccountOperationClient.getTrasanctions(String.valueOf(ACCOUNT_ID))
+                    .statusCode(SC_OK);
 
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         } finally {
             try {
-                dockerClient.startContainerCmd(API_CONTAINER_NAME).exec();
+                dockerClient.startContainerCmd(DB_CONTAINER_NAME).exec();
                 Thread.sleep(5000);
             } catch (Exception e) {
                 System.err.println(e.getMessage());

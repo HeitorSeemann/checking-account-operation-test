@@ -1,0 +1,26 @@
+{
+  "total" : 2,
+  "items" : [ {
+    "uid" : "d42b5fdeda33593ee84352e89c0c9d9d",
+    "name" : "com.heitor.checkingaccountoperation.functional.ApiWithdrawalFunctionalTest",
+    "statistic" : {
+      "failed" : 0,
+      "broken" : 0,
+      "skipped" : 0,
+      "passed" : 4,
+      "unknown" : 0,
+      "total" : 4
+    }
+  }, {
+    "uid" : "f9ca1c717d9db18cb42c155653ecbd70",
+    "name" : "com.heitor.checkingaccountoperation.contract.WithdrawalContractTest",
+    "statistic" : {
+      "failed" : 0,
+      "broken" : 0,
+      "skipped" : 0,
+      "passed" : 2,
+      "unknown" : 0,
+      "total" : 2
+    }
+  } ]
+}

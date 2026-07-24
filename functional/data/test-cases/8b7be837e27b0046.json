@@ -1,0 +1,60 @@
+{
+  "uid" : "8b7be837e27b0046",
+  "name" : "shouldWithdrawals()",
+  "fullName" : "com.heitor.checkingaccountoperation.functional.ApiWithdrawalFunctionalTest.shouldWithdrawals",
+  "historyId" : "886623a21e03b696cd6d86a6b6e1afb5",
+  "time" : {
+    "start" : 1784920783565,
+    "stop" : 1784920784021,
+    "duration" : 456
+  },
+  "description" : "",
+  "status" : "passed",
+  "flaky" : false,
+  "newFailed" : false,
+  "beforeStages" : [ ],
+  "afterStages" : [ ],
+  "labels" : [ {
+    "name" : "junit.platform.uniqueid",
+    "value" : "[engine:junit-jupiter]/[class:com.heitor.checkingaccountoperation.functional.ApiWithdrawalFunctionalTest]/[method:shouldWithdrawals()]"
+  }, {
+    "name" : "host",
+    "value" : "runnervmvrwv9"
+  }, {
+    "name" : "thread",
+    "value" : "3998@runnervmvrwv9.main(3)"
+  }, {
+    "name" : "framework",
+    "value" : "junit-platform"
+  }, {
+    "name" : "language",
+    "value" : "java"
+  }, {
+    "name" : "package",
+    "value" : "com.heitor.checkingaccountoperation.functional.ApiWithdrawalFunctionalTest"
+  }, {
+    "name" : "testClass",
+    "value" : "com.heitor.checkingaccountoperation.functional.ApiWithdrawalFunctionalTest"
+  }, {
+    "name" : "testMethod",
+    "value" : "shouldWithdrawals"
+  }, {
+    "name" : "suite",
+    "value" : "com.heitor.checkingaccountoperation.functional.ApiWithdrawalFunctionalTest"
+  }, {
+    "name" : "resultFormat",
+    "value" : "allure2"
+  } ],
+  "parameters" : [ ],
+  "links" : [ ],
+  "hidden" : false,
+  "retry" : false,
+  "extra" : {
+    "severity" : "normal",
+    "retries" : [ ],
+    "categories" : [ ],
+    "tags" : [ ]
+  },
+  "source" : "8b7be837e27b0046.json",
+  "parameterValues" : [ ]
+}

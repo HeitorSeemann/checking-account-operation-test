@@ -1,0 +1,60 @@
+{
+  "uid" : "b7c528526de66251",
+  "name" : "shouldValidatecontractPostWithdrawal()",
+  "fullName" : "com.heitor.checkingaccountoperation.contract.WithdrawalContractTest.shouldValidatecontractPostWithdrawal",
+  "historyId" : "d0b92d465ef0c293cd80bd7ffecc92cf",
+  "time" : {
+    "start" : 1784920784110,
+    "stop" : 1784920784353,
+    "duration" : 243
+  },
+  "description" : "",
+  "status" : "passed",
+  "flaky" : false,
+  "newFailed" : false,
+  "beforeStages" : [ ],
+  "afterStages" : [ ],
+  "labels" : [ {
+    "name" : "junit.platform.uniqueid",
+    "value" : "[engine:junit-jupiter]/[class:com.heitor.checkingaccountoperation.contract.WithdrawalContractTest]/[method:shouldValidatecontractPostWithdrawal()]"
+  }, {
+    "name" : "host",
+    "value" : "runnervmvrwv9"
+  }, {
+    "name" : "thread",
+    "value" : "3998@runnervmvrwv9.main(3)"
+  }, {
+    "name" : "framework",
+    "value" : "junit-platform"
+  }, {
+    "name" : "language",
+    "value" : "java"
+  }, {
+    "name" : "package",
+    "value" : "com.heitor.checkingaccountoperation.contract.WithdrawalContractTest"
+  }, {
+    "name" : "testClass",
+    "value" : "com.heitor.checkingaccountoperation.contract.WithdrawalContractTest"
+  }, {
+    "name" : "testMethod",
+    "value" : "shouldValidatecontractPostWithdrawal"
+  }, {
+    "name" : "suite",
+    "value" : "com.heitor.checkingaccountoperation.contract.WithdrawalContractTest"
+  }, {
+    "name" : "resultFormat",
+    "value" : "allure2"
+  } ],
+  "parameters" : [ ],
+  "links" : [ ],
+  "hidden" : false,
+  "retry" : false,
+  "extra" : {
+    "severity" : "normal",
+    "retries" : [ ],
+    "categories" : [ ],
+    "tags" : [ ]
+  },
+  "source" : "b7c528526de66251.json",
+  "parameterValues" : [ ]
+}

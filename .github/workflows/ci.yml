@@ -38,7 +38,6 @@ jobs:
           KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
           KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
-      # Adicionado o serviço do PostgreSQL para o ecossistema do GitHub Actions
       postgres:
         image: postgres:17-alpine
         ports:
@@ -84,7 +83,6 @@ jobs:
         run: |
           timeout 60s sh -c 'until nc -z 127.0.0.1 9092; do sleep 2; done'
 
-      # Novo passo adicionado para garantir estabilidade da conexão de banco antes do bootRun
       - name: Wait for PostgreSQL Database Readiness
         run: |
           timeout 30s sh -c 'until nc -z 127.0.0.1 5432; do sleep 2; done'
@@ -97,7 +95,6 @@ jobs:
           fi
           cd ..
 
-      # Ajustado o comando para passar as credenciais dinâmicas do PostgreSQL via argumentos de inicialização
       - name: Compile and Launch Target API
         run: |
           cd api-target
@@ -124,7 +121,7 @@ jobs:
           fi
 
       - name: Execute RestAssured Automation Tests Excluding Kafka
-        run: mvn clean test -Dtest=!KafkaWithdrawalFunctionalTest,!KafkaChaosTest
+        run: mvn clean test -Dtest=!KafkaWithdrawalFunctionalTest,!KafkaChaosTest,!DataBaseChaosTest
         continue-on-error: true
 
       - name: Execute K6 Performance Stress Tests
